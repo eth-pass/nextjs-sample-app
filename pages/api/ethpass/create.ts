@@ -50,7 +50,6 @@ export default async function handler(
             signature,
             signatureMessage,
             tokenId,
-            templateId: null, // Your custom Template ID
           }),
           headers: new Headers({
             "content-type": "application/json",
