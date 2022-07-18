@@ -1,203 +1,71 @@
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount, useSigner } from "wagmi";
-import { useEffect, useState } from "react";
-import QRCode from "qrcode";
+import { CameraIcon, TicketIcon } from "@heroicons/react/outline";
+import { useRouter } from "next/router";
 
-export default function Home() {
-  const { data } = useAccount();
-  const { data: signer, isError, isLoading } = useSigner();
-  const [pending, setPending] = useState<boolean>(false);
-  const [postResult, setPostResult] = useState<any>({});
-  const [getResult, setGetResult] = useState<any>({});
-  const [scanResult, setScanResult] = useState<any>({});
+const features = [
+  {
+    name: "Generate Pass",
+    route: "/create",
+    description: "Simple form input example",
+    icon: (
+      <TicketIcon
+        className="h-6 w-6 text-white"
+        style={{ transform: "rotate(270deg)" }}
+      />
+    ),
+  },
+  {
+    name: "Scanner",
+    route: "/scanner",
+    description: "Scan QR code on passes",
+    icon: <CameraIcon className="h-6 w-6 text-white" />,
+  },
+];
 
-  const [qrCode, setQRCode] = useState(null);
-
-  const isActive = !!data?.address;
-
-  useEffect(() => {
-    if (!isActive) {
-      reset();
-    }
-  }, [isActive]);
-
-  const reset = () => {
-    setPostResult(null);
-    setGetResult(null);
-    setScanResult(null);
-    setQRCode(null);
-  };
-
-  // Call made to create genesis wallet pass
-  const createPass = async () => {
-    const signatureMessage = `Sign this message to generate a test pass with ethpass.xyz\n${Date.now()}`;
-    const signature = await signer.signMessage(signatureMessage);
-    const payload = {
-      signature,
-      signatureMessage,
-      contractAddress: "",
-      tokenId: "",
-      chainId: "",
-      platform: "apple", // 'apple' or 'google'
-      image: "", // Optional thumbnail image URL to be displayed on pass.
-    };
-    setPending(true);
-    try {
-      const response = await fetch("/api/ethpass/create", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-      });
-
-      const json = await response.json();
-      setPostResult(json);
-      console.log("## POST Result", json);
-      QRCode.toDataURL(json.fileURL, {}, function (err, url) {
-        if (err) throw err;
-        setQRCode(url);
-      });
-    } catch (err) {
-      console.log("## ERROR", err);
-    } finally {
-      setPending(false);
-    }
-  };
-
-  // Call made to fetch pass information and/or offer the user the option to download the pass again
-  const getPass = async () => {
-    setPending(true);
-    try {
-      const response = await fetch(`/api/ethpass/get?id=${postResult.id}`, {
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-      });
-
-      const json = await response.json();
-      console.log("## GET Result", json);
-      setGetResult(json);
-    } catch (err) {
-      console.log("## ERROR", err);
-    } finally {
-      setPending(false);
-    }
-  };
-
-  // Call made to verify pass and return the metadata encoded in the barcode.
-  // This call will generally be made from the device that scans the passes.
-  const scanPass = async () => {
-    setPending(true);
-
-    try {
-      const response = await fetch(
-        `/api/ethpass/scan?data=${getResult.barcodeSignature}`,
-        {
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-        }
-      );
-
-      const json = await response.json();
-      console.log("## SCAN Result", json);
-      setScanResult(json);
-    } catch (err) {
-      console.log("## ERROR", err);
-    } finally {
-      setPending(false);
-    }
-  };
+export default function Example() {
+  const router = useRouter();
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>ETHPass API Implementation Demo</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <ConnectButton />
-
-        {isActive ? (
-          <div className={styles.grid}>
-            <div className={styles.card}>
+    <div className="relative bg-white py-16 sm:py-24 lg:py-32">
+      <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+        <h2 className="text-base font-semibold uppercase tracking-wider text-indigo-600">
+          ethpass.xyz
+        </h2>
+        <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          List of sample integrations using our API
+        </p>
+        <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
+          Phasellus lorem quam molestie id quisque diam aenean nulla in.
+          Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
+          condimentum id viverra nulla.
+        </p>
+        <div className="mt-12">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => (
               <button
-                style={{ width: 200 }}
-                onClick={() => !pending && createPass()}
+                key={feature.name}
+                className="pt-6"
+                onClick={() => router.push(feature.route)}
               >
-                Create Pass
-              </button>
-
-              {qrCode ? (
-                <>
-                  <div>
-                    <img src={qrCode} />
+                <div className="flow-root rounded-lg bg-gray-50 px-6 pb-8">
+                  <div className="-mt-6">
+                    <div>
+                      <span className="inline-flex items-center justify-center rounded-md bg-indigo-500 p-3 shadow-lg">
+                        {feature.icon}
+                      </span>
+                    </div>
+                    <h3 className="mt-8 text-lg font-medium tracking-tight text-gray-900">
+                      {feature.name}
+                    </h3>
+                    <p className="mt-5 text-base text-gray-500">
+                      {feature.description}
+                    </p>
                   </div>
-                  <small>
-                    <strong>Scan QR code to download wallet pass</strong>
-                  </small>
-                  <small>Pass ID: {postResult.id}</small>
-                </>
-              ) : null}
-            </div>
-            {postResult?.id ? (
-              <div className={styles.card}>
-                <button
-                  style={{ width: 200 }}
-                  onClick={() => !pending && getPass()}
-                >
-                  Get Pass
-                </button>
-                {getResult?.barcodeSignature
-                  ? Object.keys(getResult).map((key) => {
-                      return (
-                        <small key={key}>
-                          <strong>{key}:</strong> {String(getResult[key])}
-                        </small>
-                      );
-                    })
-                  : null}
-              </div>
-            ) : null}
-            {getResult?.barcodeSignature ? (
-              <div className={styles.card}>
-                <button
-                  style={{ width: 200 }}
-                  onClick={() => !pending && scanPass()}
-                >
-                  Scan Barcode
-                </button>
-                {scanResult?.message
-                  ? Object.keys(scanResult).map((key) => {
-                      return (
-                        <small key={key}>
-                          <strong>{key}:</strong> {String(scanResult[key])}
-                        </small>
-                      );
-                    })
-                  : null}
-              </div>
-            ) : null}
+                </div>
+              </button>
+            ))}
           </div>
-        ) : null}
-        {postResult?.id ? (
-          <a
-            style={{
-              color: "red",
-              fontWeight: "bold",
-            }}
-            href="#"
-            onClick={reset}
-          >
-            RESET
-          </a>
-        ) : null}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
