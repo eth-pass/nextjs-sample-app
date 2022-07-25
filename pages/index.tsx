@@ -5,7 +5,7 @@ const features = [
   {
     name: "Generate Pass",
     route: "/create",
-    description: "Simple form input example",
+    description: "Start by creating your creating your first pass",
     icon: (
       <TicketIcon
         className="h-6 w-6 text-white"
@@ -16,7 +16,7 @@ const features = [
   {
     name: "Scanner",
     route: "/scanner",
-    description: "Scan QR code on passes",
+    description: "Web camera module for scanning passes",
     icon: <CameraIcon className="h-6 w-6 text-white" />,
   },
 ];
@@ -31,15 +31,14 @@ export default function Example() {
           ethpass.xyz
         </h2>
         <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-          List of sample integrations using our API
+          Sample integrations
         </p>
         <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-          Phasellus lorem quam molestie id quisque diam aenean nulla in.
-          Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-          condimentum id viverra nulla.
+          Here are some examples you can use to get started with integrating our
+          API.
         </p>
         <div className="mt-12">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2 justify-center">
             {features.map((feature) => (
               <button
                 key={feature.name}

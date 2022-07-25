@@ -24,7 +24,6 @@ export default function Home() {
   const [pending, setPending] = useState<boolean>(false);
   const [postResult, setPostResult] = useState<any>({});
   const [getResult, setGetResult] = useState<any>({});
-  const [scanResult, setScanResult] = useState<any>({});
   const { showModal: showDownloadModal, open } = useDownloadModalContext();
 
   const [formData, setFormData] = useState(requiredParams);
@@ -231,7 +230,7 @@ export default function Home() {
       </div>
     );
   };
-
+  console.log(getResult);
   const renderSinglePassActions = () => {
     return (
       <div className="bg-white shadow sm:rounded-lg">
@@ -242,8 +241,8 @@ export default function Home() {
           <div className="mt-2 sm:flex sm:items-start sm:justify-between">
             <div className="max-w-xl text-sm text-gray-500">
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Recusandae voluptatibus corrupti atque repudiandae nam.
+                Pass successfully created! Use the unique identifier above to
+                make further API requests for this pass.
               </p>
             </div>
             <div className="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center flex-col">
@@ -255,29 +254,15 @@ export default function Home() {
                     "GET"
                   );
                   setGetResult(response);
+                  showDownloadModal({
+                    fileURL: response.fileURL,
+                    platform: response.platform,
+                  });
                 }}
                 type="button"
                 className="mb-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
               >
-                GET Request
-              </button>
-              <button
-                onClick={() =>
-                  !pending &&
-                  apiCall(
-                    `/api/ethpass/scan?data=${getResult.barcodeSignature}`,
-                    "GET"
-                  )
-                }
-                type="button"
-                className={classNames(
-                  "inline-flex items-center px-6 py-2 my-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white",
-                  getResult?.id
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                )}
-              >
-                SCAN Request
+                Download
               </button>
             </div>
           </div>
