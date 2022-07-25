@@ -21,8 +21,7 @@ export default async function handler(
         let pass;
         if (platform === Platform.APPLE) {
           pass = {
-            description: "ETHPass Sample Pass",
-            logoText: "ethpass.xyz",
+            description: "ETHPASS API DEMO",
             auxiliaryFields: [],
             backFields: [],
             headerFields: [],
