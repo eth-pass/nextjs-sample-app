@@ -9,7 +9,9 @@ export default async function handler(
       const { data } = req.query;
       try {
         const payload = await fetch(
-          `https://api.ethpass.xyz/api/v0/passes/barcode/?data=${data}`,
+          `${
+            process.env.API_HOST || "https://api.ethpass.xyz"
+          }/api/v0/passes/barcode/?data=${data}`,
           {
             method: "GET",
             headers: new Headers({

@@ -9,7 +9,9 @@ export default async function handler(
       const { id } = req.query;
       try {
         const payload = await fetch(
-          `https://api.ethpass.xyz/api/v0/passes/${id}`,
+          `${
+            process.env.API_HOST || "https://api.ethpass.xyz"
+          }/api/v0/passes/${id}`,
           {
             method: "GET",
             headers: new Headers({
@@ -19,9 +21,24 @@ export default async function handler(
           }
         );
 
+        const distribution = await fetch(
+          `${
+            process.env.API_HOST || "https://api.ethpass.xyz"
+          }/api/v0/passes/${id}/distribute`,
+          {
+            method: "GET",
+            headers: new Headers({
+              "content-type": "application/json",
+              "x-api-key": process.env.ETHPASS_API_KEY,
+            }),
+          }
+        );
+
+        const { fileURL } = await distribution.json();
+
         if (payload.status === 200) {
           const json = await payload.json();
-          return res.status(200).json(json);
+          return res.status(200).json({ ...json, fileURL });
         } else {
           const json = await payload.json();
           return res.status(payload.status).send(json.message);
