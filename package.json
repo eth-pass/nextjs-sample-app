@@ -1,13 +1,13 @@
 {
-  "name": "nextjs-sample-app",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@lena-test/create-ethpass-nextjs-app",
+  "version": "0.1.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
+  "bin": "./npm-cli/index.js",
   "dependencies": {
     "@headlessui/react": "^1.6.6",
     "@heroicons/react": "^1.0.6",
