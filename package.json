@@ -13,6 +13,7 @@
     "@heroicons/react": "^1.0.6",
     "@rainbow-me/rainbowkit": "^0.4.2",
     "ethers": "^5.6.6",
+    "moment": "^2.29.4",
     "next": "12.1.6",
     "node-fetch": "^3.2.4",
     "qr-scanner": "^1.4.1",

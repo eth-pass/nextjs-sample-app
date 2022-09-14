@@ -11,7 +11,7 @@ export default async function handler(
         const payload = await fetch(
           `${
             process.env.API_HOST || "https://api.ethpass.xyz"
-          }/api/v0/passes/barcode/?data=${data}`,
+          }/api/v0/scan/?data=${data}`,
           {
             method: "GET",
             headers: new Headers({

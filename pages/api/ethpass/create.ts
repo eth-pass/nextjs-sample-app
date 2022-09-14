@@ -44,14 +44,19 @@ export default async function handler(
                 message:
                   "The contents of this message will be returned in the response payload after the pass has been scanned",
               },
-              chainId,
-              contractAddress,
+              chain: {
+                name: "evm",
+                network: chainId,
+              },
+              nft: {
+                contractAddress,
+                tokenId,
+              },
               image,
               pass,
               platform,
               signature,
               signatureMessage,
-              tokenId,
             }),
             headers: new Headers({
               "content-type": "application/json",
