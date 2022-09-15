@@ -1,9 +1,10 @@
 import { CheckIcon, XIcon } from "@heroicons/react/outline";
-import { ellipsizeAddress } from "../helpers/format";
 import { Fragment, useState, useEffect, useRef } from "react";
 import { Transition, Dialog } from "@headlessui/react";
-import LoadingIndicator from "../components/LoadingIndicator";
 import QrScanner from "qr-scanner";
+import moment from "moment";
+import { ellipsizeAddress } from "../helpers/format";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function Scanner(props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -66,22 +67,138 @@ export default function Scanner(props) {
         }),
       });
 
-      const json = await response.json();
-      console.log("## SCAN Result", json);
-      setScanResult(json);
+      if (response.status === 200) {
+        const json = await response.json();
+        setScanResult({ valid: true, ...json });
+      } else {
+        setScanResult({ valid: false });
+      }
     } catch (err) {
       setScanResult({ valid: false });
       console.log("## ERROR", err);
     }
   };
 
+  const renderNFTDetails = () => {
+    return (
+      <>
+        <h3 className="mt-4 text-xl tracking-tight font-extrabold text-gray-900">
+          NFT Details
+        </h3>
+        {scanResult?.nft?.contractAddress ? (
+          <p className="mb-2 text-sm text-gray-500">
+            {" "}
+            <strong>Contract Address: </strong>
+            {ellipsizeAddress(scanResult?.nft?.contractAddress)}
+          </p>
+        ) : null}
+        {scanResult?.nft?.tokenId ? (
+          <p className="mb-2 text-sm text-gray-500">
+            {" "}
+            <strong>Token ID: </strong>
+            {scanResult?.nft?.tokenId}
+          </p>
+        ) : null}
+        <p className="mb-2 text-sm text-gray-500 flex">
+          <strong>Network</strong>
+          <p>{scanResult?.chain?.network}</p>
+        </p>
+      </>
+    );
+  };
+
+  const renderPassMetadata = () => {
+    if (!scanResult) return;
+    return (
+      <div className="mt-2 text-justify">
+        <p className="mb-2 text-sm text-gray-500">
+          <strong>Owner: </strong>
+          {ellipsizeAddress(scanResult?.ownerAddress)}
+        </p>
+
+        {scanResult?.chain?.name ? (
+          <p className="mb-2 text-sm text-gray-500">
+            {" "}
+            <strong>Chain: </strong>
+            {scanResult?.chain?.name.toUpperCase()}
+          </p>
+        ) : null}
+        {scanResult?.lastScannedAt && (
+          <p className="mb-2 text-sm text-gray-500">
+            <strong>Last scanned:</strong>{" "}
+            {new Date(scanResult?.lastScannedAt).toLocaleString()}
+          </p>
+        )}
+        {scanResult?.nft ? <>{renderNFTDetails()}</> : null}
+      </div>
+    );
+  };
+
+  const renderIcon = () => {
+    if (!scanResult) return;
+    if (!scanResult?.valid) {
+      return (
+        <div>
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <XIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+          </div>
+          <div className="mt-3 text-center sm:mt-5">
+            <Dialog.Title
+              as="h3"
+              className="text-lg leading-6 font-medium text-gray-900"
+            >
+              Pass Invalid
+            </Dialog.Title>
+            <div className="mt-2"></div>
+          </div>
+        </div>
+      );
+    }
+    if (scanResult.lastScannedAt) {
+      return (
+        <div>
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+            <CheckIcon className="h-6 w-6 text-yellow-700" aria-hidden="true" />
+          </div>
+          <div className="mt-3 text-center sm:mt-5">
+            <Dialog.Title
+              as="h3"
+              className="text-lg leading-6 font-medium text-gray-900"
+            >
+              Ownership Verified
+            </Dialog.Title>
+            <div className="mt-2">
+              <p className="text-sm text-gray-500 mb-4">
+                {`Ownership is valid, however this pass was scanned ${moment(
+                  scanResult?.lastScannedAt
+                ).fromNow()}.`}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+            <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+          </div>
+          <div className="mt-3 text-center sm:mt-5">
+            <Dialog.Title
+              as="h3"
+              className="text-lg leading-6 font-medium text-gray-900"
+            >
+              Ownership Verified
+            </Dialog.Title>
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <>
       <div className="grid justify-center">
-        <div className="text-center p-6">
-          <h3 className="font-bold text-lg">Scanner</h3>
-        </div>
-
         <video
           ref={videoRef}
           className="rounded-xl object-cover w-full max-w-sm h-96 mb-8"
@@ -108,121 +225,72 @@ export default function Scanner(props) {
       </div>
 
       <Transition.Root show={pending} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={reset}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
+        <Dialog
+          as="div"
+          className="fixed z-10 inset-0 overflow-y-auto"
+          onClose={reset}
+        >
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
 
-          <div className="fixed z-10 inset-0 overflow-y-auto">
-            <div className="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full sm:p-6 w-full">
-                  {scanResult ? (
+            {/* This element is to trick the browser into centering the modal contents. */}
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+              <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle md:max-w-lg w-full sm:p-6">
+                <div>{renderIcon()}</div>
+                {scanResult?.valid ? <div>{renderPassMetadata()}</div> : null}
+                {scanResult ? (
+                  <div>
+                    <div className="mt-5 sm:mt-6">
+                      <button
+                        type="button"
+                        className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                        onClick={reset}
+                      >
+                        Scan another pass
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
                     <div>
-                      <div>
-                        {scanResult.valid ? (
-                          <div>
-                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                              <CheckIcon
-                                className="h-6 w-6 text-green-600"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="mt-3 text-center sm:mt-5">
-                              <Dialog.Title
-                                as="h3"
-                                className="text-lg leading-6 font-medium text-gray-900"
-                              >
-                                Verified
-                              </Dialog.Title>
-                              <div className="mt-2 break-words">
-                                <p className="text-sm text-gray-500">
-                                  <strong>Contract Address: </strong>
-                                  {ellipsizeAddress(scanResult.contractAddress)}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  <strong>Token ID: </strong>
-                                  {scanResult.tokenId}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  <strong>Chain ID: </strong>
-                                  {scanResult.chainId}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  <strong>Owner: </strong>
-                                  {ellipsizeAddress(scanResult.ownerAddress)}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  <strong>Barcode Payload: </strong>
-                                  {scanResult.message}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                              <XIcon
-                                className="h-6 w-6 text-red-600"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="mt-3 text-center sm:mt-5">
-                              <Dialog.Title
-                                as="h3"
-                                className="text-lg leading-6 font-medium text-gray-900"
-                              >
-                                Invalid
-                              </Dialog.Title>
-                              <div className="mt-2"></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-5 sm:mt-6">
-                        <button
-                          type="button"
-                          className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                          onClick={reset}
+                      <LoadingIndicator />
+                      <div className="mt-3 text-center sm:mt-5">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-lg leading-6 font-medium text-gray-900"
                         >
-                          Scan another pass
-                        </button>
+                          Verifying...
+                        </Dialog.Title>
                       </div>
                     </div>
-                  ) : (
-                    <div>
-                      <div>
-                        <LoadingIndicator />
-                        <div className="mt-3 text-center sm:mt-5">
-                          <Dialog.Title
-                            as="h3"
-                            className="text-lg leading-6 font-medium text-gray-900"
-                          >
-                            Verifying...
-                          </Dialog.Title>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
+                  </div>
+                )}
+              </div>
+            </Transition.Child>
           </div>
         </Dialog>
       </Transition.Root>

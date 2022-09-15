@@ -46,7 +46,7 @@ export default async function handler(
               },
               chain: {
                 name: "evm",
-                network: chainId
+                network: chainId,
               },
               nft: {
                 contractAddress,
@@ -64,7 +64,6 @@ export default async function handler(
             }),
           }
         );
-
         if (payload.status === 200) {
           const json = await payload.json();
           return res.status(200).json(json);
