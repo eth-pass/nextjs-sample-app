@@ -78,10 +78,14 @@ export default function Home() {
           platform: payload.platform,
         });
       } else if (response.status === 401) {
-        toast.error("Unable to verify ownership");
+        toast.error(`Unable to verify ownership: ${response.statusText}`);
       } else {
-        const { error, message } = await response.json();
-        toast.error(error || message);
+        try {
+          const { error, message } = await response.json();
+          toast.error(error || message);
+        } catch {
+          toast.error(`${response.status}: ${response.statusText}`);
+        }
       }
     } catch (err) {
       console.log("## POST ERROR", err);
