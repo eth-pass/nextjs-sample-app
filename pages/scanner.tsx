@@ -3,6 +3,7 @@ import { Fragment, useState, useEffect, useRef } from "react";
 import { Transition, Dialog } from "@headlessui/react";
 import QrScanner from "qr-scanner";
 import moment from "moment";
+import Image from "next/image";
 import { ellipsizeAddress } from "../helpers/format";
 import LoadingIndicator from "../components/LoadingIndicator";
 
@@ -69,39 +70,42 @@ export default function Scanner(props) {
 
       if (response.status === 200) {
         const json = await response.json();
-        setScanResult({ valid: true, ...json });
+        setScanResult({ success: true, ...json });
       } else {
-        setScanResult({ valid: false });
+        setScanResult({ success: false });
       }
     } catch (err) {
-      setScanResult({ valid: false });
+      setScanResult({ success: false });
       console.log("## ERROR", err);
     }
   };
 
   const renderNFTDetails = () => {
+    const nft = scanResult.nfts[0];
     return (
       <>
         <h3 className="mt-4 text-xl tracking-tight font-extrabold text-gray-900">
           NFT Details
         </h3>
-        {scanResult?.nft?.contractAddress ? (
+        {nft?.contractAddress ? (
           <p className="mb-2 text-sm text-gray-500">
             {" "}
             <strong>Contract Address: </strong>
-            {ellipsizeAddress(scanResult?.nft?.contractAddress)}
+            {ellipsizeAddress(nft?.contractAddress)}
           </p>
         ) : null}
-        {scanResult?.nft?.tokenId ? (
+        {nft?.tokenId ? (
           <p className="mb-2 text-sm text-gray-500">
             {" "}
             <strong>Token ID: </strong>
-            {scanResult?.nft?.tokenId}
+            {nft?.tokenId}
           </p>
         ) : null}
-        <p className="mb-2 text-sm text-gray-500 flex">
-          <strong>Network</strong>
-          <p>{scanResult?.chain?.network}</p>
+        <p className="mb-2 text-sm text-gray-500">
+          <strong>Network ID: </strong> {scanResult?.chain?.network}
+        </p>
+        <p className="mb-2 text-sm text-gray-500">
+          <strong>Ownership Status: </strong> {nft?.valid ? "Valid" : "Invalid"}
         </p>
       </>
     );
@@ -129,14 +133,20 @@ export default function Scanner(props) {
             {new Date(scanResult?.lastScannedAt).toLocaleString()}
           </p>
         )}
-        {scanResult?.nft ? <>{renderNFTDetails()}</> : null}
+        {scanResult?.expiredAt && (
+          <p className="mb-2 text-sm text-gray-500">
+            <strong>Pass Expired:</strong>{" "}
+            {new Date(scanResult?.expiredAt).toLocaleString()}
+          </p>
+        )}
+        {scanResult?.nfts?.length ? <>{renderNFTDetails()}</> : null}
       </div>
     );
   };
 
   const renderIcon = () => {
     if (!scanResult) return;
-    if (!scanResult?.valid) {
+    if (!scanResult?.success || scanResult.expiredAt) {
       return (
         <div>
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
@@ -165,11 +175,11 @@ export default function Scanner(props) {
               as="h3"
               className="text-lg leading-6 font-medium text-gray-900"
             >
-              Ownership Verified
+              Valid Pass
             </Dialog.Title>
             <div className="mt-2">
               <p className="text-sm text-gray-500 mb-4">
-                {`Ownership is valid, however this pass was scanned ${moment(
+                {`This pass is valid however, it was scanned ${moment(
                   scanResult?.lastScannedAt
                 ).fromNow()}.`}
               </p>
@@ -188,7 +198,7 @@ export default function Scanner(props) {
               as="h3"
               className="text-lg leading-6 font-medium text-gray-900"
             >
-              Ownership Verified
+              Valid Pass
             </Dialog.Title>
           </div>
         </div>
@@ -261,7 +271,7 @@ export default function Scanner(props) {
             >
               <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle md:max-w-lg w-full sm:p-6">
                 <div>{renderIcon()}</div>
-                {scanResult?.valid ? <div>{renderPassMetadata()}</div> : null}
+                {scanResult?.success ? <div>{renderPassMetadata()}</div> : null}
                 {scanResult ? (
                   <div>
                     <div className="mt-5 sm:mt-6">
