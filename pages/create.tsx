@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Platform } from "../components/DownloadModal";
-import { useAccount, useSigner } from "wagmi";
+import { useAccount, useNetwork, useSigner } from "wagmi";
 import { useDownloadModalContext } from "../contexts/downloadModal";
 import { useEffect, useState } from "react";
 import Head from "next/head";
@@ -10,23 +10,32 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const requiredParams = {
+type FormData = {
+  contractAddress: string;
+  tokenId: string;
+  image: string;
+  chainId: string;
+  platform: Platform.APPLE | Platform.GOOGLE,
+}
+
+const defaultParams = {
   contractAddress: "",
   tokenId: "",
   image: "",
   chainId: "",
   platform: Platform.APPLE,
-};
+}
 
 export default function Home() {
   const { address } = useAccount();
+  const { chain } = useNetwork();
+
   const { data: signer } = useSigner();
   const [pending, setPending] = useState<boolean>(false);
   const [postResult, setPostResult] = useState<any>({});
-  const [getResult, setGetResult] = useState<any>({});
-  const { showModal: showDownloadModal, open } = useDownloadModalContext();
+  const { showModal: showDownloadModal } = useDownloadModalContext();
 
-  const [formData, setFormData] = useState(requiredParams);
+  const [formData, setFormData] = useState<FormData>(defaultParams);
 
   useEffect(() => {
     if (!address) {
@@ -36,17 +45,51 @@ export default function Home() {
 
   const reset = () => {
     setPostResult(null);
-    setGetResult(null);
-    setFormData(requiredParams);
+    setFormData(defaultParams);
   };
 
-  // Call made to create genesis wallet pass
+  /***
+   * Call made to check if pass with these parameters already exists in the project.
+   * Only console logs a warning, and does not prevent creation of duplicate pass.
+   */
+  const checkDuplicates = async () => {
+    const params = {
+      ownerAddress: address,
+      contractAddress: formData.contractAddress,
+      tokenId: formData.tokenId,
+      network: chain.id.toString(),
+      chain: "evm",
+      expired: "0",
+    };
+    const response = await fetch(
+        "/api/ethpass/query?" + new URLSearchParams(params),
+
+        {
+          method: "GET",
+          headers: new Headers({
+            "content-type": "application/json",
+          }),
+        }
+    );
+    const existing = (await response.json())
+
+    if (existing.length) {
+      console.log("WARNING: Pass with these parameters already exists: ", existing)
+    }
+  };
+
+  /***
+   * Call made to create a pass with ethpass
+   */
   const createPass = async () => {
+    await checkDuplicates()
+
     const signatureToast = toast.loading("Waiting for signature...");
 
     const signatureMessage = `Sign this message to generate a test pass with ethpass.xyz\n${Date.now()}`;
     const signature = await signer.signMessage(signatureMessage);
     toast.dismiss(signatureToast);
+    console.log(signature)
 
     const payload = {
       ...formData,
@@ -120,10 +163,6 @@ export default function Home() {
     }
   };
 
-  // Call made to fetch pass information and/or offer the user the option to download the pass again
-
-  // Call made to verify pass and return the metadata encoded in the barcode.
-  // This call will generally be made from the device that scans the passes.
 
   const renderForm = () => {
     const validInput =
@@ -234,7 +273,10 @@ export default function Home() {
       </div>
     );
   };
-  console.log(getResult);
+
+  /***
+   * Call made to fetch pass information and/or offer the user the option to download the pass again
+   */
   const renderSinglePassActions = () => {
     return (
       <div className="bg-white shadow sm:rounded-lg">
@@ -257,7 +299,6 @@ export default function Home() {
                     `/api/ethpass/get?id=${postResult.id}`,
                     "GET"
                   );
-                  setGetResult(response);
                   showDownloadModal({
                     fileURL: response.fileURL,
                     platform: response.platform,

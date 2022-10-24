@@ -59,6 +59,11 @@ export default function Scanner(props) {
     }, 300); // Transition animation duration
   };
 
+  /***
+   * Call made to verify pass and return the metadata encoded in the barcode.
+   * This call will generally be made from the device that scans the passes.
+   */
+
   const scanPass = async (data?: string) => {
     setPending(true);
     try {
