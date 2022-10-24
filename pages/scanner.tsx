@@ -64,10 +64,10 @@ export default function Scanner(props) {
    * This call will generally be made from the device that scans the passes.
    */
 
-  const scanPass = async (data?: string) => {
+  const scanPass = async (barcode?: string) => {
     setPending(true);
     try {
-      const response = await fetch(`/api/ethpass/scan?data=${data}`, {
+      const response = await fetch(`/api/ethpass/scan?data=${barcode}`, {
         headers: new Headers({
           "content-type": "application/json",
         }),
@@ -75,7 +75,15 @@ export default function Scanner(props) {
 
       if (response.status === 200) {
         const json = await response.json();
+
+        if (json.expiredAt){
+          console.log('WARNING: Pass is expired. Reason:', json.expireAction)
+        }
+        else if (json.nfts?.some(nft => !nft.valid)) {
+          console.log("WARNING: Pass is invalid")
+        }
         setScanResult({ success: true, ...json });
+
       } else {
         setScanResult({ success: false });
       }
@@ -118,7 +126,8 @@ export default function Scanner(props) {
 
   const renderPassMetadata = () => {
     if (!scanResult) return;
-    return (
+
+    else return (
       <div className="mt-2 text-justify">
         <p className="mb-2 text-sm text-gray-500">
           <strong>Owner: </strong>
@@ -139,10 +148,16 @@ export default function Scanner(props) {
           </p>
         )}
         {scanResult?.expiredAt && (
-          <p className="mb-2 text-sm text-gray-500">
-            <strong>Pass Expired:</strong>{" "}
-            {new Date(scanResult?.expiredAt).toLocaleString()}
-          </p>
+            <>  <p className="mb-2 text-sm text-gray-500">
+              <strong>Pass Expired:</strong>{" "}
+              {new Date(scanResult?.expiredAt).toLocaleString()}
+            </p>
+              <p className="mb-2 text-sm text-gray-500">
+                <strong>Expired Reason:</strong>{" "}
+                {scanResult.expireAction}
+              </p>
+            </>
+
         )}
         {scanResult?.nfts?.length ? <>{renderNFTDetails()}</> : null}
       </div>
@@ -151,7 +166,7 @@ export default function Scanner(props) {
 
   const renderIcon = () => {
     if (!scanResult) return;
-    if (!scanResult?.success || scanResult.expiredAt) {
+    if (!scanResult?.success || scanResult.expiredAt || scanResult.nfts?.some(nft => !nft.valid)) {
       return (
         <div>
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
@@ -236,8 +251,37 @@ export default function Scanner(props) {
           >
             STOP
           </button>
+
+          <p className="mt-16 tracking-tight text-gray-900 text-2xl tracking-wide font-extrabold">
+            MANUALLY TYPE BARCODE
+          </p>
+
+          <div className="flex flex-col items-center justify-center">
+            <form
+                className="flex flex-col items-center justify-center"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const barcode = e.target[0].value;
+                  scanPass(barcode);
+                }}
+            >
+              <input
+                  className="mt-4 block w-96 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500
+                  sm:text-sm"
+                  required
+                  type="text"
+              />
+              <input
+                  type="submit"
+                  className="mt-4 inline-flex items-center rounded-full border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  value="SCAN"
+              />
+            </form>
+          </div>
         </div>
       </div>
+
+
 
       <Transition.Root show={pending} as={Fragment}>
         <Dialog
