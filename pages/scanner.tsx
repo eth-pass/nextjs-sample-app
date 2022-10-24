@@ -130,7 +130,7 @@ export default function Scanner(props) {
   const renderPassMetadata = () => {
     if (!scanResult) return;
 
-    else return (
+    return (
       <div className="mt-2 text-justify">
         <p className="mb-2 text-sm text-gray-500">
           <strong>Owner: </strong>
