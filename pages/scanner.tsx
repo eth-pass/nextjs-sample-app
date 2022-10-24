@@ -76,9 +76,12 @@ export default function Scanner(props) {
       if (response.status === 200) {
         const json = await response.json();
 
+        // check if pass expired
         if (json.expiredAt){
           console.log('WARNING: Pass is expired. Reason:', json.expireAction)
         }
+
+        // check if pass is valid (all NFTs still owner by signer)
         else if (json.nfts?.some(nft => !nft.valid)) {
           console.log("WARNING: Pass is invalid")
         }

@@ -89,7 +89,6 @@ export default function Home() {
     const signatureMessage = `Sign this message to generate a test pass with ethpass.xyz\n${Date.now()}`;
     const signature = await signer.signMessage(signatureMessage);
     toast.dismiss(signatureToast);
-    console.log(signature)
 
     const payload = {
       ...formData,
