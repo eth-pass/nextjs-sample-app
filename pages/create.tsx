@@ -5,10 +5,7 @@ import { useDownloadModalContext } from "contexts/downloadModal";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import toast from "react-hot-toast";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import { classNames } from "helpers/tailwind";
 
 const requiredParams = {
   contractAddress: "",
@@ -249,7 +246,7 @@ export default function Home() {
                 make further API requests for this pass.
               </p>
             </div>
-            <div className="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center flex-col">
+            <div className="mt-5 sm:mt-0 sm:ml-6 sm:shrink-0 sm:flex sm:items-center flex-col">
               <button
                 onClick={async () => {
                   if (pending) return;
