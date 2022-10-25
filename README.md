@@ -47,4 +47,4 @@ For full API documentation, visit [docs.ethpass.xyz](https://docs.ethpass.xyz).
 
 #### 429 alchemy-api errors / rate limiting errors
 - The app leverages `wagmi`'s free RPC provider (see `pages/_app.tsx`). This provider is subject to rate limiting and is not 100% reliable, especially for production.
-- You can reference `wagmi`'s documentation on how to set up a private provider [here](https://wagmi.sh/docs/providers/public).
+- If your use case requires a reliable provider, please reference `wagmi`'s [documentation](https://wagmi.sh/docs/providers/public) on how to set up your own provider with alchemy/infura/etc.
