@@ -44,12 +44,22 @@ export default function DownloadModal() {
         </div>
         {platform && platform === Platform.APPLE ? (
           <a href={fileURL} download>
-            <Image src={addAppleWallet} width={120} height={37} alt={qrCode} />
+            <Image
+              src={addAppleWallet}
+              width={120}
+              height={37}
+              alt="Add to Apple Wallet"
+            />
           </a>
         ) : (
           platform && (
             <a target="_blank" href={fileURL} rel="noreferrer">
-              <Image src={addGooglePay} width={180} height={48} alt={qrCode} />
+              <Image
+                src={addGooglePay}
+                width={180}
+                height={48}
+                alt="Add to Google Pay"
+              />
             </a>
           )
         )}
