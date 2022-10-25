@@ -1,11 +1,11 @@
 import "@rainbow-me/rainbowkit/styles.css";
-import "../styles/globals.css";
+import "styles/globals.css";
 
 import { chain, createClient, WagmiProvider, configureChains } from "wagmi";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
-import { DownloadModalProvider } from "../contexts/downloadModal";
+import { DownloadModalProvider } from "contexts/downloadModal";
 import { Toaster } from "react-hot-toast";
 
 const { chains, provider } = configureChains(

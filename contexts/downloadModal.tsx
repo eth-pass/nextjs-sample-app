@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import DownloadModal, { Platform } from "../components/DownloadModal";
+import DownloadModal, { Platform } from "components/DownloadModal";
 
 const DownloadModalContext = createContext({
   open: false,

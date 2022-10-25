@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Platform } from "../../../components/DownloadModal";
+import { Platform } from "components/DownloadModal";
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,7 +36,9 @@ export default async function handler(
 
         // Request to create pass
         const payload = await fetch(
-          `${process.env.API_HOST || "https://api.ethpass.xyz"}/api/v0/passes`,
+          `${
+            process.env.ETHPASS_API_HOST || "https://api.ethpass.xyz"
+          }/api/v0/passes`,
           {
             method: "POST",
             body: JSON.stringify({
