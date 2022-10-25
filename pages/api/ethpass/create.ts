@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Platform } from "../../../components/DownloadModal";
+import { Platform } from "components/DownloadModal";
 
 export default async function handler(
   req: NextApiRequest,

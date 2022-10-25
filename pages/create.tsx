@@ -1,7 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Platform } from "../components/DownloadModal";
+import { Platform } from "components/DownloadModal";
 import { useAccount, useSigner } from "wagmi";
-import { useDownloadModalContext } from "../contexts/downloadModal";
+import { useDownloadModalContext } from "contexts/downloadModal";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import toast from "react-hot-toast";

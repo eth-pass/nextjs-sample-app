@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@heroicons/react/outline";
-import { useDownloadModalContext } from "../contexts/downloadModal";
+import { useDownloadModalContext } from "contexts/downloadModal";
 import Image from "next/image";
-import addAppleWallet from "../public/assets/apple-wallet-add.png";
-import addGooglePay from "../public/assets/google-pay-add.png";
+import addAppleWallet from "public/assets/apple-wallet-add.png";
+import addGooglePay from "public/assets/google-pay-add.png";
 import QRCode from "qrcode";
 import Modal from "./Modal";
 

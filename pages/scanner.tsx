@@ -4,8 +4,8 @@ import { Transition, Dialog } from "@headlessui/react";
 import QrScanner from "qr-scanner";
 import moment from "moment";
 import Image from "next/image";
-import { ellipsizeAddress } from "../helpers/format";
-import LoadingIndicator from "../components/LoadingIndicator";
+import { ellipsizeAddress } from "helpers/format";
+import LoadingIndicator from "components/LoadingIndicator";
 
 export default function Scanner(props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
