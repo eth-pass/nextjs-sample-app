@@ -6,7 +6,6 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { publicProvider } from "wagmi/providers/public";
 import { DownloadModalProvider } from "../contexts/downloadModal";
 import { Toaster } from "react-hot-toast";
-// import { alchemyProvider } from "wagmi/providers/alchemy";
 
 const { chains, provider } = configureChains(
   [ chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, chain.goerli],

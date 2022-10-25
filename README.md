@@ -42,5 +42,9 @@ For full API documentation, visit [docs.ethpass.xyz](https://docs.ethpass.xyz).
 
 ## Troubleshooting
 
-- Camera not working on mobile devices
-  - Make sure the web server has valid SSL certificates and is available with `https://`
+#### Camera not working on mobile devices
+- Make sure the web server has valid SSL certificates and is available with `https://`
+
+#### 429 alchemy-api errors / rate limiting errors
+- The app leverages `wagmi`'s free RPC provider (see `pages/_app.tsx`). This provider is subject to rate limiting and is not 100% reliable, especially for production.
+- You can reference `wagmi`'s documentation on how to set up a private provider [here](https://wagmi.sh/docs/providers/public).
