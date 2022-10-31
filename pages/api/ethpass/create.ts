@@ -34,47 +34,45 @@ export default async function handler(
           };
         }
 
+        const body = {
+          barcode: {
+            message:
+              "The contents of this message will be returned in the response payload after the pass has been scanned",
+          },
+          chain: {
+            name: "evm",
+            network: chainId,
+          },
+          nft: {
+            contractAddress,
+            tokenId,
+          },
+          image,
+          pass,
+          platform,
+          signature,
+          signatureMessage,
+        };
+
         // Request to create pass
-        const payload = await fetch(
+        const result = await fetch(
           `${
             process.env.ETHPASS_API_HOST || "https://api.ethpass.xyz"
           }/api/v0/passes`,
           {
             method: "POST",
-            body: JSON.stringify({
-              barcode: {
-                message:
-                  "The contents of this message will be returned in the response payload after the pass has been scanned",
-              },
-              chain: {
-                name: "evm",
-                network: chainId,
-              },
-              nft: {
-                contractAddress,
-                tokenId,
-              },
-              image,
-              pass,
-              platform,
-              signature,
-              signatureMessage,
-            }),
+            body: JSON.stringify(body),
             headers: new Headers({
               "content-type": "application/json",
               "x-api-key": process.env.ETHPASS_API_KEY,
             }),
           }
         );
-        if (payload.status === 200) {
-          const json = await payload.json();
-          return res.status(200).json(json);
-        } else {
-          const json = await payload.json();
-          return res.status(payload.status).send(json.message);
-        }
+        const json = await result.json();
+        return res.status(result.status).json(json);
       } catch (err) {
-        return res.status(400).send(err.message);
+        console.log(err);
+        return res.status(400).json({ error: err.message });
       }
 
     default:

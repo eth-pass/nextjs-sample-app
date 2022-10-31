@@ -8,7 +8,7 @@ export default async function handler(
     case "GET":
       const { data } = req.query;
       try {
-        const payload = await fetch(
+        const result = await fetch(
           `${
             process.env.ETHPASS_API_HOST || "https://api.ethpass.xyz"
           }/api/v0/scan/?data=${data}`,
@@ -21,15 +21,11 @@ export default async function handler(
           }
         );
 
-        if (payload.status === 200) {
-          const json = await payload.json();
-          return res.status(200).json(json);
-        } else {
-          const json = await payload.json();
-          return res.status(payload.status).send(json.message);
-        }
+        const json = await result.json();
+        return res.status(result.status).json(json);
       } catch (err) {
-        return res.status(400).send(err.message);
+        console.log(err);
+        return res.status(400).json({ error: err.message });
       }
 
     default:
