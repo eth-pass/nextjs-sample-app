@@ -45,5 +45,9 @@ The app has some eslint plugins installed for typescript, react, nextjs, and tai
 
 ## Troubleshooting
 
-- Camera not working on mobile devices
-  - Make sure the web server has valid SSL certificates and is available with `https://`
+#### Camera not working on mobile devices
+- Make sure the web server has valid SSL certificates and is available with `https://`
+
+#### 429 alchemy-api errors / rate limiting errors
+- The app leverages wagmi's free RPC provider (see `pages/_app.tsx`). This provider is subject to rate limiting and is not 100% reliable, especially for production.
+- If your use case requires a reliable provider, please reference wagmi's [documentation](https://wagmi.sh/docs/providers/public) to configure your own provider with alchemy / infura / etc.
