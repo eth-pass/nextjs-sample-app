@@ -10,7 +10,7 @@ export default async function handler(
       try {
         const payload = await fetch(
           `${
-            process.env.API_HOST || "https://api.ethpass.xyz"
+            process.env.ETHPASS_API_HOST || "https://api.ethpass.xyz"
           }/api/v0/scan/?data=${data}`,
           {
             method: "GET",

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Platform } from "../../../components/DownloadModal";
+import { Platform } from "components/DownloadModal";
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,7 +37,7 @@ export default async function handler(
         const body = {
           barcode: {
             message:
-                "The contents of this message will be returned in the response payload after the pass has been scanned",
+              "The contents of this message will be returned in the response payload after the pass has been scanned",
           },
           chain: {
             name: "evm",
@@ -52,11 +52,13 @@ export default async function handler(
           platform,
           signature,
           signatureMessage,
-        }
+        };
 
         // Request to create pass
         const response = await fetch(
-          `${process.env.API_HOST || "https://api.ethpass.xyz"}/api/v0/passes`,
+          `${
+            process.env.ETHPASS_API_HOST || "https://api.ethpass.xyz"
+          }/api/v0/passes`,
           {
             method: "POST",
             body: JSON.stringify(body),

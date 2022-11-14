@@ -1,22 +1,19 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Platform } from "../components/DownloadModal";
+import { Platform } from "components/DownloadModal";
 import { useAccount, useNetwork, useSigner } from "wagmi";
-import { useDownloadModalContext } from "../contexts/downloadModal";
+import { useDownloadModalContext } from "contexts/downloadModal";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import toast from "react-hot-toast";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import { classNames } from "helpers/tailwind";
 
 type FormData = {
   contractAddress: string;
   tokenId: string;
   image: string;
   chainId: string;
-  platform: Platform.APPLE | Platform.GOOGLE,
-}
+  platform: Platform.APPLE | Platform.GOOGLE;
+};
 
 const defaultParams = {
   contractAddress: "",
@@ -24,7 +21,7 @@ const defaultParams = {
   image: "",
   chainId: "",
   platform: Platform.APPLE,
-}
+};
 
 export default function Home() {
   const { address } = useAccount();
@@ -62,19 +59,22 @@ export default function Home() {
       expired: "0",
     };
     const response = await fetch(
-        "/api/ethpass/query?" + new URLSearchParams(params),
+      "/api/ethpass/query?" + new URLSearchParams(params),
 
-        {
-          method: "GET",
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-        }
+      {
+        method: "GET",
+        headers: new Headers({
+          "content-type": "application/json",
+        }),
+      }
     );
-    const existing = (await response.json())
+    const existing = await response.json();
 
     if (existing.length) {
-      console.log("WARNING: Pass with these parameters already exists: ", existing)
+      console.log(
+        "WARNING: Pass with these parameters already exists: ",
+        existing
+      );
     }
   };
 
@@ -82,7 +82,7 @@ export default function Home() {
    * Call made to create a pass with ethpass
    */
   const createPass = async () => {
-    await checkDuplicates()
+    await checkDuplicates();
 
     const signatureToast = toast.loading("Waiting for signature...");
 
@@ -161,7 +161,6 @@ export default function Home() {
       setPending(false);
     }
   };
-
 
   const renderForm = () => {
     const validInput =
@@ -290,7 +289,7 @@ export default function Home() {
                 make further API requests for this pass.
               </p>
             </div>
-            <div className="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center flex-col">
+            <div className="mt-5 sm:mt-0 sm:ml-6 sm:shrink-0 sm:flex sm:items-center flex-col">
               <button
                 onClick={async () => {
                   if (pending) return;

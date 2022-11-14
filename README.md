@@ -40,6 +40,9 @@ Scan passes to verify ownership and view the data you encoded in the barcode.
 
 For full API documentation, visit [docs.ethpass.xyz](https://docs.ethpass.xyz).
 
+## Linting
+The app has some eslint plugins installed for typescript, react, nextjs, and tailwind. Run `yarn lint --fix` to lint your code. 
+
 ## Troubleshooting
 
 #### Camera not working on mobile devices

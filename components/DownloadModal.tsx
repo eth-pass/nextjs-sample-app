@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@heroicons/react/outline";
-import { useDownloadModalContext } from "../contexts/downloadModal";
+import { useDownloadModalContext } from "contexts/downloadModal";
 import Image from "next/image";
-import addAppleWallet from "../public/assets/apple-wallet-add.png";
-import addGooglePay from "../public/assets/google-pay-add.png";
+import addAppleWallet from "public/assets/apple-wallet-add.png";
+import addGooglePay from "public/assets/google-pay-add.png";
 import QRCode from "qrcode";
-import Modal from "./Modal";
+import Modal from "components/Modal";
 
 export enum Platform {
   APPLE = "apple",
@@ -30,13 +30,13 @@ export default function DownloadModal() {
       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
         <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
       </div>
-      <div className="mt-3 text-center sm:mt-5 flex flex-col justify-center align-center">
+      <div className="mt-3 text-center sm:mt-5 flex flex-col justify-center">
         <div className="mt-2 text-center">
           <p className="block text-sm font-medium text-gray-500 pointer-events-none">{`Scan QR code using your ${
             platform === Platform.GOOGLE ? "Android" : "Apple"
           } device`}</p>
-          <div className="w-250 h-250 flex justify-center">
-            <img src={qrCode} />
+          <div className="flex justify-center">
+            <Image src={qrCode} alt="QR Code" width={250} height={250} />
           </div>
           <p className="block text-sm font-medium text-gray-500 pointer-events-none mb-2">
             Or tap below to download directly on your mobile device.
@@ -44,12 +44,22 @@ export default function DownloadModal() {
         </div>
         {platform && platform === Platform.APPLE ? (
           <a href={fileURL} download>
-            <Image src={addAppleWallet} width={120} height={37} />
+            <Image
+              src={addAppleWallet}
+              width={120}
+              height={37}
+              alt="Add to Apple Wallet"
+            />
           </a>
         ) : (
           platform && (
             <a target="_blank" href={fileURL} rel="noreferrer">
-              <Image src={addGooglePay} width={180} height={48} />
+              <Image
+                src={addGooglePay}
+                width={180}
+                height={48}
+                alt="Add to Google Pay"
+              />
             </a>
           )
         )}
