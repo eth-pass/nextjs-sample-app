@@ -30,7 +30,7 @@ export default function MagicLink() {
 
   useEffect(() => {
     setMagic(
-      new Magic("pk_live_114950D800431BB3", {
+      new Magic(process.env.NEXT_PUBLIC_MAGIC_LINK_API_KEY, {
         network: "mainnet",
         locale: "en_US",
         extensions: [new ConnectExtension()],

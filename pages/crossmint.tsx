@@ -8,7 +8,7 @@ import Modal from "components/Modal";
 import toast from "react-hot-toast";
 
 const _crossmintConnect = new CrossmintEVMWalletAdapter({
-  apiKey: "sk_live.cMX8Kojp.9EYPDS1ouMPy151RfGPLPYCt1dk5bBB4",
+  apiKey: process.env.NEXT_PUBLIC_CROSSMINT_API_KEY,
   chain: BlockchainTypes.ETHEREUM, // BlockchainTypes.ETHEREUM || BlockchainTypes.POLYGON. For solana use BlockchainTypes.SOLANA
 });
 
