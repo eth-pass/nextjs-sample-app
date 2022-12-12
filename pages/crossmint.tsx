@@ -302,7 +302,7 @@ export default function Crossmint() {
     <>
       <div className="flex justify-center">
         <Head>
-          <title>ETHPass | Magic Link</title>
+          <title>ethpass | Crossmint Example</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <main>

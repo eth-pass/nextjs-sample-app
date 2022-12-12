@@ -336,7 +336,7 @@ export default function MagicLink() {
   return (
     <div className="flex justify-center">
       <Head>
-        <title>ETHPass | Magic Link</title>
+        <title>ethpass | Magic Link Example</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
