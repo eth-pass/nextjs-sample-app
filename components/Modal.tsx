@@ -20,7 +20,7 @@ export default function Modal({
     <Transition.Root show={isActive} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed z-10 inset-0 overflow-y-auto"
+        className="fixed inset-0 overflow-y-auto z-50"
         onClose={onClose}
       >
         <div className="flex items-end sm:items-center justify-center h-screen w-screen">
@@ -34,7 +34,7 @@ export default function Modal({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" />
+            <Dialog.Overlay className="fixed inset-0 bg-gray-700/20 transition-opacity" />
           </Transition.Child>
 
           {/* Content */}
