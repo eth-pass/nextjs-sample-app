@@ -115,10 +115,10 @@
     stream-browserify "^3.0.0"
     util "^0.12.4"
 
-"@crossmint/connect@^0.0.5-alpha-2":
-  version "0.0.5-alpha-2"
-  resolved "https://registry.yarnpkg.com/@crossmint/connect/-/connect-0.0.5-alpha-2.tgz#7507392432970dcf7739321da8bb2f1a4335fa59"
-  integrity sha512-S3ioyvLeKFdBRxbTDDvbP6UDYROpTdxSUlt3QfFsVrqwbSGZhFZpTXohhIDs1KNsL/hDseS7qOJWZsEFZ6DsNQ==
+"@crossmint/connect@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@crossmint/connect/-/connect-0.0.8.tgz#7d1877b5933191a2990886520fccb47fad975d19"
+  integrity sha512-2qcO3IdriQB2e3RfBywqqH+BGKp01ugHKUG4rSJeVxJTHeogoHP5UX9UAOeXttSwJiOeRPh5lciAFi2O+HOSoA==
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.7"
     "@solana/web3.js" "^1.47.3"
