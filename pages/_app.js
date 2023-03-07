@@ -1,41 +1,41 @@
-import "@rainbow-me/rainbowkit/styles.css";
+import React, { useMemo } from "react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import {
+  GlowWalletAdapter,
+  PhantomWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
+import { clusterApiUrl } from "@solana/web3.js";
+import { DownloadModalProvider } from "contexts/downloadModal";
+
+import "@solana/wallet-adapter-react-ui/styles.css";
 import "styles/globals.css";
 
-import { chain, createClient, WagmiProvider, configureChains } from "wagmi";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
-import { DownloadModalProvider } from "contexts/downloadModal";
-import { Toaster } from "react-hot-toast";
+const App = ({ Component, pageProps }) => {
+  const network = WalletAdapterNetwork.Devnet;
 
-const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
-  [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
-);
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-const { connectors } = getDefaultWallets({
-  appName: "ethpass demo",
-  chains,
-});
-
-const wagmiClient = createClient({
-  autoConnect: true,
-  persister: null,
-  connectors,
-  provider,
-});
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <WagmiProvider client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <DownloadModalProvider>
-          <Component {...pageProps} />
-          <Toaster />
-        </DownloadModalProvider>
-      </RainbowKitProvider>
-    </WagmiProvider>
+  const wallets = useMemo(
+    () => [new PhantomWalletAdapter(), new GlowWalletAdapter()],
+    [network]
   );
-}
 
-export default MyApp;
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <DownloadModalProvider>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
+            <Component {...pageProps} />
+          </WalletModalProvider>
+        </WalletProvider>
+      </DownloadModalProvider>
+    </ConnectionProvider>
+  );
+};
+
+export default App;
