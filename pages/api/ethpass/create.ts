@@ -8,6 +8,7 @@ export default async function handler(
   switch (req.method) {
     case "POST":
       const {
+        chain,
         chainId,
         contractAddress,
         image,
@@ -47,12 +48,12 @@ export default async function handler(
                   "The contents of this message will be returned in the response payload after the pass has been scanned",
               },
               chain: {
-                name: "evm",
-                network: chainId,
+                name: chain?.name || "evm",
+                network: chain?.network || chainId,
               },
               nft: {
                 contractAddress,
-                tokenId,
+                tokenId: tokenId || "",
               },
               image,
               pass,

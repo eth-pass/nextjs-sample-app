@@ -1,15 +1,36 @@
-import "@rainbow-me/rainbowkit/styles.css";
-import "styles/globals.css";
+import React, { useMemo } from "react";
 
-import { chain, createClient, WagmiProvider, configureChains } from "wagmi";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+// evm
+import { createClient, WagmiConfig, configureChains } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+
+// solana
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import {
+  GlowWalletAdapter,
+  PhantomWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
+import { clusterApiUrl } from "@solana/web3.js";
+
+// misc
 import { DownloadModalProvider } from "contexts/downloadModal";
 import { Toaster } from "react-hot-toast";
 
+// css
+import "@rainbow-me/rainbowkit/styles.css";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import "styles/globals.css";
+
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [mainnet, polygon, optimism, arbitrum],
   [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
@@ -25,17 +46,32 @@ const wagmiClient = createClient({
   provider,
 });
 
-function MyApp({ Component, pageProps }) {
-  return (
-    <WagmiProvider client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <DownloadModalProvider>
-          <Component {...pageProps} />
-          <Toaster />
-        </DownloadModalProvider>
-      </RainbowKitProvider>
-    </WagmiProvider>
-  );
-}
+const App = ({ Component, pageProps }) => {
+  const network = WalletAdapterNetwork.Devnet;
 
-export default MyApp;
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+
+  const wallets = useMemo(
+    () => [new PhantomWalletAdapter(), new GlowWalletAdapter()],
+    [network]
+  );
+
+  return (
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains}>
+        <ConnectionProvider endpoint={endpoint}>
+          <DownloadModalProvider>
+            <WalletProvider wallets={wallets} autoConnect>
+              <WalletModalProvider>
+                <Component {...pageProps} />
+                <Toaster />
+              </WalletModalProvider>
+            </WalletProvider>
+          </DownloadModalProvider>
+        </ConnectionProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
+  );
+};
+
+export default App;
