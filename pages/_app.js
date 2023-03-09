@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
 
 // evm
-import { chain, createClient, WagmiProvider, configureChains } from "wagmi";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { createClient, WagmiConfig, configureChains } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
 // solana
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -29,7 +30,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import "styles/globals.css";
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [mainnet, polygon, optimism, arbitrum],
   [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
@@ -56,7 +57,7 @@ const App = ({ Component, pageProps }) => {
   );
 
   return (
-    <WagmiProvider client={wagmiClient}>
+    <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
         <ConnectionProvider endpoint={endpoint}>
           <DownloadModalProvider>
@@ -69,7 +70,7 @@ const App = ({ Component, pageProps }) => {
           </DownloadModalProvider>
         </ConnectionProvider>
       </RainbowKitProvider>
-    </WagmiProvider>
+    </WagmiConfig>
   );
 };
 
