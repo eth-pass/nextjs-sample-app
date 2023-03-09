@@ -1,22 +1,29 @@
-import Head from "next/head";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useState } from "react";
-import { Platform } from "components/DownloadModal";
-import toast from "react-hot-toast";
 import { classNames } from "helpers/tailwind";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { sign } from "tweetnacl";
-import bs58 from "bs58";
+import { Platform } from "components/DownloadModal";
 import { useDownloadModalContext } from "contexts/downloadModal";
+import { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import toast from "react-hot-toast";
+
+const WalletMultiButtonDynamic = dynamic(
+  async () =>
+    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+  { ssr: false }
+);
 
 export default function Home() {
   const { publicKey, signMessage } = useWallet();
 
   const [formData, setFormData] = useState({
-    contractAddress: "3CSsPvG3pGX3wCNJwZZMS3KySZcvZ5Mpk1Qhhoqbm4Tb",
-    tokenId: "473",
+    contractAddress: "",
     image: "",
     chainId: "mainnet",
+    chain: {
+      name: "solana",
+      network: "mainnet",
+    },
     platform: Platform.APPLE,
   });
   const [pending, setPending] = useState(false);
@@ -114,8 +121,7 @@ export default function Home() {
   };
 
   const renderForm = () => {
-    const validInput =
-      formData.contractAddress && formData.tokenId && formData.chainId;
+    const validInput = formData.contractAddress;
 
     return (
       <div className="max-w-3xl mx-auto py-12">
@@ -123,51 +129,16 @@ export default function Home() {
           htmlFor="contract"
           className="block text-sm font-medium text-gray-700"
         >
-          <span className="text-red-500">* </span>Contract Address
+          <span className="text-red-500">* </span>Token Address
         </label>
         <div className="mt-1 mb-6">
           <input
             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
             required
             type="text"
-            minLength={42}
-            maxLength={42}
             value={formData.contractAddress}
             onChange={(e) =>
               setFormData({ ...formData, contractAddress: e.target.value })
-            }
-          />
-        </div>
-        <label
-          htmlFor="tokenId"
-          className="block text-sm font-medium text-gray-700"
-        >
-          <span className="text-red-500">* </span>Token ID
-        </label>
-        <div className="mt-1 mb-6">
-          <input
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-            required
-            type="number"
-            value={formData.tokenId}
-            onChange={(e) =>
-              setFormData({ ...formData, tokenId: e.target.value })
-            }
-          />
-        </div>
-        <label
-          htmlFor="network"
-          className="block text-sm font-medium text-gray-700"
-        >
-          <span className="text-red-500">* </span> Chain ID
-        </label>
-        <div className="mt-1 mb-6">
-          <input
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-            type="text"
-            value={formData.chainId}
-            onChange={(e) =>
-              setFormData({ ...formData, chainId: e.target.value })
             }
           />
         </div>
@@ -270,7 +241,9 @@ export default function Home() {
       </Head>
 
       <main className="flex flex-col items-center justify-center h-screen w-full gap-4">
-        <WalletMultiButton />
+        <div className="bg-zinc-700 rounded">
+          <WalletMultiButtonDynamic />
+        </div>
 
         {publicKey ? (
           <div>
